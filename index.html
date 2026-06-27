@@ -1069,11 +1069,6 @@
 <script>
 // ─── DATA ───────────────────────────────────────────────────────
 // ─── FRAGEN NACH MODUS + INTENSITÄT ────────────────────────────
-// Jeder Pool ist exakt auf seinen Modus zugeschnitten:
-// haveyouever → immer "Hast du schon mal..." → klares Ja/Nein
-// talk        → offene Gesprächsfragen, kein Ja/Nein nötig
-// drink       → kurz, direkt, eindeutig Ja/Nein
-
 const QUESTIONS = {
   haveyouever: {
     flirty: [
@@ -1089,6 +1084,18 @@ const QUESTIONS = {
       { de: "Hast du schon mal einen Streit zwischen uns absichtlich vermieden, weil du Angst hattest, mich zu verlieren?", en: "Have you ever deliberately avoided a fight because you were afraid of losing me?" },
       { de: "Hast du schon mal etwas Peinliches über dich verschwiegen, damit ich ein bestimmtes Bild von dir behalte?", en: "Have you ever hidden something embarrassing so I'd keep a certain image of you?" },
       { de: "Hast du schon mal eifersüchtig auf jemanden reagiert, dem ich nah war?", en: "Have you ever felt jealous about someone I was close to?" },
+      { de: "Hast du schon mal nach Wegen gesucht, mich zufällig zu treffen?", en: "Have you ever arranged to bump into me 'accidentally'?" },
+      { de: "Hast du schon mal ein Gespräch mit mir so oft in Gedanken wiederholt, dass du die Worte auswendig kannst?", en: "Have you ever replayed a conversation with me so often you know it word for word?" },
+      { de: "Hast du schon mal jemandem erzählt, wie gut ich bin — ohne dass ich dabei war?", en: "Have you ever told someone how great I am when I wasn't around?" },
+      { de: "Hast du schon mal ein Geschenk für mich geplant, das du dann doch nie umgesetzt hast?", en: "Have you ever planned a gift for me that you never ended up giving?" },
+      { de: "Hast du schon mal absichtlich etwas vergessen, nur damit du mich nochmal fragen musstest?", en: "Have you ever pretended to forget something just so you'd have a reason to contact me?" },
+      { de: "Hast du schon mal meinen Geruch vermisst, wenn wir uns lange nicht gesehen haben?", en: "Have you ever missed my scent when we hadn't seen each other for a while?" },
+      { de: "Hast du schon mal jemanden um Rat gefragt, wie du mich beeindrucken kannst?", en: "Have you ever asked someone for advice on how to impress me?" },
+      { de: "Hast du schon mal insgeheim gehofft, dass ich eifersüchtig werde?", en: "Have you ever secretly hoped I'd get jealous?" },
+      { de: "Hast du schon mal etwas gesagt, das du nicht meintest, nur um einen Streit zu beenden?", en: "Have you ever said something you didn't mean just to end a fight?" },
+      { de: "Hast du schon mal ein Foto von uns als Hintergrundbild gesetzt, ohne es mir zu sagen?", en: "Have you ever set a photo of us as your wallpaper without telling me?" },
+      { de: "Hast du schon mal beim Einschlafen gehofft, von mir zu träumen?", en: "Have you ever fallen asleep hoping you'd dream about me?" },
+      { de: "Hast du schon mal gelächelt, nur weil du an mich gedacht hast?", en: "Have you ever smiled just because you thought of me?" },
     ],
     spicy: [
       { de: "Hast du schon mal etwas Intimes mit mir fantasiert, von dem ich keine Ahnung habe?", en: "Have you ever had an intimate fantasy about me that I don't know about?" },
@@ -1103,6 +1110,18 @@ const QUESTIONS = {
       { de: "Hast du schon mal beim Sex gelogen, wie gut es war?", en: "Have you ever faked or exaggerated how good sex was?" },
       { de: "Hast du schon mal Sex an einem Ort gehabt, wo ihr erwischt werden konntet?", en: "Have you ever had sex somewhere you could have been caught?" },
       { de: "Hast du schon mal jemanden aus unserem Freundeskreis sexuell attraktiv gefunden?", en: "Have you ever found someone from our social circle sexually attractive?" },
+      { de: "Hast du schon mal jemanden geküsst, von dem du wusstest, dass es falsch war?", en: "Have you ever kissed someone knowing it was wrong?" },
+      { de: "Hast du schon mal explizite Nachrichten mit jemandem ausgetauscht, den ich kenne?", en: "Have you ever exchanged explicit messages with someone I know?" },
+      { de: "Hast du schon mal im Büro oder auf der Arbeit an Sex gedacht?", en: "Have you ever thought about sex at work or in the office?" },
+      { de: "Hast du schon mal jemanden aus reiner körperlicher Anziehung getroffen — ohne Gefühle?", en: "Have you ever met up with someone out of pure physical attraction — no feelings?" },
+      { de: "Hast du schon mal Unterwäsche nur für jemand anderen gekauft?", en: "Have you ever bought underwear specifically for someone else?" },
+      { de: "Hast du schon mal jemanden durch Kleidung oder Bewegung absichtlich provoziert?", en: "Have you ever deliberately provoked someone through clothing or movement?" },
+      { de: "Hast du schon mal eine intime Situation herbeigeführt, ohne dass der andere es gemerkt hat?", en: "Have you ever engineered an intimate situation without the other person realizing?" },
+      { de: "Hast du schon mal etwas im Bett ausprobiert und hinterher bereut, es erwähnt zu haben?", en: "Have you ever tried something in bed and then regretted bringing it up?" },
+      { de: "Hast du schon mal jemandem gesagt, du liebst ihn — und es nicht wirklich gemeint?", en: "Have you ever told someone you love them without really meaning it?" },
+      { de: "Hast du schon mal absichtlich jemanden eifersüchtig gemacht, um eine Reaktion zu provozieren?", en: "Have you ever deliberately made someone jealous to provoke a reaction?" },
+      { de: "Hast du schon mal über eine One-Night-Stand Situation nachgedacht, ohne sie durchzuführen?", en: "Have you ever thought seriously about a one-night stand without going through with it?" },
+      { de: "Hast du schon mal eine Beziehung begonnen, bevor die vorherige offiziell beendet war?", en: "Have you ever started a new relationship before the previous one was officially over?" },
     ],
     extreme: [
       { de: "Hast du schon mal ein Sexvideo von dir selbst gemacht?", en: "Have you ever made a sex video of yourself?" },
@@ -1110,13 +1129,25 @@ const QUESTIONS = {
       { de: "Hast du schon mal über eine offene Beziehung nachgedacht — mit mir?", en: "Have you ever thought about being in an open relationship — with me?" },
       { de: "Hast du schon mal eine sexuelle Handlung ausprobiert, von der du weißt, dass ich schockiert wäre?", en: "Have you ever tried a sexual act you know would shock me?" },
       { de: "Hast du schon mal intime Fotos von dir an jemanden geschickt, den du kaum kanntest?", en: "Have you ever sent intimate photos of yourself to someone you barely knew?" },
-      { de: "Hast du schon mal jemanden in einer Öffentlichkeit sexuell provoziert, ohne dass es jemand gemerkt hat?", en: "Have you ever sexually teased someone in public without anyone noticing?" },
+      { de: "Hast du schon mal jemanden in der Öffentlichkeit sexuell provoziert, ohne dass es jemand gemerkt hat?", en: "Have you ever sexually teased someone in public without anyone noticing?" },
       { de: "Hast du schon mal eine Affäre gehabt oder wärst du nah dran gewesen?", en: "Have you ever had an affair or come close to having one?" },
-      { de: "Hast du schon mal etwas Sexuelles getan, das du bis heute niemandem erzählt hast?", en: "Have you ever done something sexual that you've never told anyone about?" },
+      { de: "Hast du schon mal etwas Sexuelles getan, das du bis heute niemandem erzählt hast?", en: "Have you ever done something sexual you've never told anyone about?" },
       { de: "Hast du schon mal jemanden so begehrt, dass du dafür etwas Riskantes getan hast?", en: "Have you ever wanted someone so badly you did something risky for it?" },
       { de: "Hast du schon mal Sex gehabt und danach bereut, mit wem?", en: "Have you ever had sex and regretted who it was with?" },
       { de: "Hast du schon mal jemanden heimlich verfolgt — online oder im echten Leben?", en: "Have you ever secretly followed someone — online or in real life?" },
       { de: "Hast du schon mal etwas Intimes von jemandem weitergegeben, das du nie hättest teilen dürfen?", en: "Have you ever shared something intimate about someone that you never should have?" },
+      { de: "Hast du schon mal jemanden erpresst — emotional oder anders?", en: "Have you ever blackmailed someone — emotionally or otherwise?" },
+      { de: "Hast du schon mal sexuelle Inhalte produziert oder geteilt, ohne dass die andere Person es wusste?", en: "Have you ever produced or shared sexual content without the other person knowing?" },
+      { de: "Hast du schon mal deine Identität online verändert, um jemanden anzulocken?", en: "Have you ever changed your identity online to attract someone?" },
+      { de: "Hast du schon mal jemanden manipuliert, um Sex zu bekommen?", en: "Have you ever manipulated someone to get sex?" },
+      { de: "Hast du schon mal etwas getan, das du heute als sexuellen Fehler bezeichnen würdest?", en: "Have you ever done something you'd now call a sexual mistake?" },
+      { de: "Hast du schon mal Grenzen einer anderen Person ignoriert, weil du zu aufgeregt warst?", en: "Have you ever ignored someone else's boundaries because you were too aroused?" },
+      { de: "Hast du schon mal ein Geheimnis über dein Sexleben, das du mit ins Grab nehmen würdest?", en: "Have you ever had a secret about your sex life you'd take to your grave?" },
+      { de: "Hast du schon mal jemanden emotional verletzt, weil du deinen Trieben nachgegeben hast?", en: "Have you ever emotionally hurt someone because you gave in to your urges?" },
+      { de: "Hast du schon mal Pornografie produziert oder daran teilgenommen?", en: "Have you ever produced or participated in pornography?" },
+      { de: "Hast du schon mal etwas gestohlen — im übertragenen Sinne — von einer anderen Beziehung?", en: "Have you ever stolen something — figuratively — from another relationship?" },
+      { de: "Hast du schon mal jemanden in einer Beziehung betrogen und es niemals zugegeben?", en: "Have you ever cheated on someone in a relationship and never admitted it?" },
+      { de: "Hast du schon mal daran gedacht, deine sexuelle Identität komplett neu zu erfinden?", en: "Have you ever thought about completely reinventing your sexual identity?" },
     ]
   },
 
@@ -1134,6 +1165,18 @@ const QUESTIONS = {
       { de: "Gibt es etwas, das du mir sagen möchtest, aber immer wieder aufgeschoben hast?", en: "Is there something you've been meaning to tell me but keep putting off?" },
       { de: "Was bedeutet Romantik für dich — und bekomme ich das bei dir?", en: "What does romance mean to you — and do you get that with me?" },
       { de: "Wo siehst du uns in fünf Jahren?", en: "Where do you see us in five years?" },
+      { de: "Was ist das Schönste, das jemand je für dich getan hat?", en: "What's the most beautiful thing anyone has ever done for you?" },
+      { de: "Welche Schwäche an mir findest du heimlich liebenswert?", en: "Which weakness of mine do you secretly find endearing?" },
+      { de: "Was würdest du tun, wenn du wüsstest, dass ich dir nicht böse sein kann?", en: "What would you do if you knew I couldn't be angry with you?" },
+      { de: "Gibt es einen Moment in unserem Leben zusammen, den du gerne nochmal erleben würdest?", en: "Is there a moment in our time together you'd love to relive?" },
+      { de: "Was glaubst du, ist das Missverständnis, das wir am häufigsten haben?", en: "What do you think is the misunderstanding we have most often?" },
+      { de: "Was hättest du mir früher gerne gesagt — aber der Moment war nie richtig?", en: "What would you have liked to tell me earlier — but the moment was never right?" },
+      { de: "Was ist das Verrückteste, das du für die Liebe getan hast?", en: "What's the craziest thing you've ever done for love?" },
+      { de: "Welchen Traum hast du, von dem du glaubst, dass ich ihn nicht kenne?", en: "What dream do you have that you think I don't know about?" },
+      { de: "Was macht dich an unserem gemeinsamen Alltag am glücklichsten?", en: "What makes you happiest about our everyday life together?" },
+      { de: "Wann hast du zuletzt so richtig über mich gelacht — und warum?", en: "When did you last really laugh because of me — and why?" },
+      { de: "Was würdest du ändern, wenn du unsere Beziehung von vorne beginnen könntest?", en: "What would you change if you could start our relationship over?" },
+      { de: "Was schätzt du an mir, das dir andere Menschen nicht geben können?", en: "What do you value in me that other people can't give you?" },
     ],
     spicy: [
       { de: "Was ist deine geheimste Fantasie — die du noch nie jemandem erzählt hast?", en: "What's your most secret fantasy — one you've never told anyone?" },
@@ -1148,6 +1191,18 @@ const QUESTIONS = {
       { de: "Was würdest du mir zeigen oder sagen, wenn du sicher wärst, dass ich nicht urteile?", en: "What would you show or tell me if you were sure I wouldn't judge?" },
       { de: "Was macht dich am meisten an — etwas, das ich vielleicht nicht weiß?", en: "What turns you on the most — something I might not know?" },
       { de: "Wenn du eine Nacht lang jemand anderen sein könntest — wen würdest du wählen und was würdest du tun?", en: "If you could be someone else for one night — who would you choose and what would you do?" },
+      { de: "Was war das erste sexuelle Erlebnis, das dich wirklich geprägt hat?", en: "What was the first sexual experience that truly shaped you?" },
+      { de: "Beschreibe deine perfekte intime Nacht — von Anfang bis Ende.", en: "Describe your perfect intimate night — from start to finish." },
+      { de: "Was ist etwas, das du dir im Bett wünschst, aber nie explizit gesagt hast?", en: "What's something you wish for in bed but have never explicitly said?" },
+      { de: "Welche Rolle spielst du lieber — aktiv oder passiv — und warum?", en: "Which role do you prefer — active or passive — and why?" },
+      { de: "Was würde dich dazu bringen, eine sexuelle Grenze zu überschreiten?", en: "What would make you cross a sexual boundary?" },
+      { de: "Welchen Film oder welche Szene findest du heimlich am aufregendsten?", en: "Which film or scene do you secretly find most exciting?" },
+      { de: "Was ist das Intimste, das du einem Menschen je anvertraut hast?", en: "What's the most intimate thing you've ever confided to someone?" },
+      { de: "Wenn du mir heute Nacht alles erlauben könntest — was würdest du wählen?", en: "If you could allow me anything tonight — what would you choose?" },
+      { de: "Was hält dich davon ab, offen über deine sexuellen Wünsche zu reden?", en: "What holds you back from talking openly about your sexual desires?" },
+      { de: "Gibt es jemanden in deiner Vergangenheit, an den du sexuell noch manchmal denkst?", en: "Is there someone from your past you still sometimes think about sexually?" },
+      { de: "Was ist das Verführerischste, das jemand je zu dir gesagt hat?", en: "What's the most seductive thing anyone has ever said to you?" },
+      { de: "Wie würdest du mir erklären, was dich wirklich erregt — ohne dich zu schämen?", en: "How would you explain to me what really arouses you — without shame?" },
     ],
     extreme: [
       { de: "Was ist das Dunkelste, das du dir sexuell vorstellen kannst — und redet ihr darüber?", en: "What's the darkest thing you can sexually imagine — and would you ever talk about it?" },
@@ -1162,6 +1217,18 @@ const QUESTIONS = {
       { de: "Was ist das Gefährlichste, das du jemals in einer Beziehung getan oder gedacht hast?", en: "What's the most dangerous thing you've ever done or thought in a relationship?" },
       { de: "Wenn du mir eine Wahrheit sagen könntest, ohne Konsequenzen zu fürchten — welche wäre das?", en: "If you could tell me one truth without fearing consequences — what would it be?" },
       { de: "Was wäre ein absolutes No-Go für dich — und haben wir es schon einmal berührt?", en: "What would be an absolute no-go for you — and have we ever come close to it?" },
+      { de: "Was ist der dunkelste Gedanke, den du jemals über eine Beziehung hattest?", en: "What's the darkest thought you've ever had about a relationship?" },
+      { de: "Gibt es etwas in unserem Sexleben, das du bereust — aber nie angesprochen hast?", en: "Is there something in our sex life you regret — but have never brought up?" },
+      { de: "Was würdest du tun, wenn ich dir sage, dass ich ein Geheimnis habe, das dich schockieren würde?", en: "What would you do if I told you I have a secret that would shock you?" },
+      { de: "Welche Lüge hast du in dieser Beziehung am längsten aufrechterhalten?", en: "What's the lie you've maintained the longest in this relationship?" },
+      { de: "Was ist das Destruktivste, das du jemals aus Leidenschaft getan hast?", en: "What's the most destructive thing you've ever done out of passion?" },
+      { de: "Wenn du könntest — würdest du lieber wissen, was ich wirklich über dich denke?", en: "If you could — would you rather know what I really think about you?" },
+      { de: "Was ist das Tabuthema in deiner Familie, das dich sexuell oder emotional geprägt hat?", en: "What's the taboo topic in your family that has shaped you sexually or emotionally?" },
+      { de: "Gibt es einen Menschen, dem du sexuell nie vergeben hast — und warum?", en: "Is there someone you've never sexually forgiven — and why?" },
+      { de: "Was hält uns wirklich davon ab, vollständig ehrlich miteinander zu sein?", en: "What really keeps us from being completely honest with each other?" },
+      { de: "Was ist das Schlimmste, das jemand jemals in deinem Namen getan hat — und du hast nichts gesagt?", en: "What's the worst thing someone has ever done in your name — and you said nothing?" },
+      { de: "Wenn du eine Seite von dir ausleben könntest, ohne geurteilt zu werden — wie würde sie aussehen?", en: "If you could live out one side of yourself without being judged — what would it look like?" },
+      { de: "Was würde passieren, wenn wir alle Filter fallen lassen — für immer?", en: "What would happen if we dropped all filters — forever?" },
     ]
   },
 
@@ -1169,9 +1236,9 @@ const QUESTIONS = {
     flirty: [
       { de: "Schon mal heimlich Fotos von jemandem angeschaut, den du mochtest?", en: "Ever secretly looked at photos of someone you liked?" },
       { de: "Schon mal jemandem eine Nachricht geschrieben — und dann doch gelöscht?", en: "Ever written a message to someone and then deleted it?" },
-      { de: "Schon mal eine Verabredung abgesagt, weil du einfach zu verliebt warst um auszugehen?", en: "Ever cancelled plans because you were too lovesick to go out?" },
+      { de: "Schon mal eine Verabredung abgesagt, weil du einfach zu verliebt warst?", en: "Ever cancelled plans because you were too lovesick to go out?" },
       { de: "Schon mal jemanden angerufen, aufgelegt — und gehofft, er ruft zurück?", en: "Ever called someone, hung up, and hoped they'd call back?" },
-      { de: "Schon mal eifersüchtig auf jemanden reagiert, dem du nie zugegeben hättest, dass es dich stört?", en: "Ever gotten jealous over someone without admitting it bothered you?" },
+      { de: "Schon mal eifersüchtig auf jemanden reagiert, dem du es nie zugegeben hättest?", en: "Ever gotten jealous over someone without admitting it bothered you?" },
       { de: "Schon mal eine Beziehung begonnen, obwohl du wusstest, dass es kompliziert wird?", en: "Ever started a relationship knowing it would get complicated?" },
       { de: "Schon mal so sehr auf jemanden gewartet, dass du das Handy alle 5 Minuten gecheckt hast?", en: "Ever waited for someone so much you checked your phone every 5 minutes?" },
       { de: "Schon mal für jemanden etwas getan, das du sonst nie tun würdest?", en: "Ever done something for someone you'd never do otherwise?" },
@@ -1179,6 +1246,18 @@ const QUESTIONS = {
       { de: "Schon mal nach einer Trennung den Ex gestalkt — auch nur ein bisschen?", en: "Ever stalked an ex after a breakup — even just a little?" },
       { de: "Schon mal ein Datum gecancelt, weil du mit deinem Aussehen unzufrieden warst?", en: "Ever cancelled a date because you felt unhappy with how you looked?" },
       { de: "Schon mal von jemandem geträumt, und dann war der nächste Tag seltsam?", en: "Ever dreamed about someone and then felt weird around them the next day?" },
+      { de: "Schon mal jemandem gesagt 'Ich liebe dich' — und es nicht wirklich gemeint?", en: "Ever said 'I love you' and not really meant it?" },
+      { de: "Schon mal absichtlich jemanden eifersüchtig gemacht?", en: "Ever deliberately made someone jealous?" },
+      { de: "Schon mal ein Geheimnis verraten, das du besser für dich behalten hättest?", en: "Ever revealed a secret you should have kept to yourself?" },
+      { de: "Schon mal jemanden nur deshalb angeschrieben, weil du einsam warst?", en: "Ever texted someone just because you were lonely?" },
+      { de: "Schon mal gelogen, wo du warst — in einer Beziehung?", en: "Ever lied about where you were — in a relationship?" },
+      { de: "Schon mal eine Person gemocht, ohne es zuzugeben — auch dir selbst gegenüber?", en: "Ever liked someone without admitting it — even to yourself?" },
+      { de: "Schon mal jemanden getroffen, obwohl du wusstest, dass es keine gute Idee ist?", en: "Ever met up with someone knowing it was a bad idea?" },
+      { de: "Schon mal jemanden angehimmelt, der absolut nicht erreichbar war?", en: "Ever had a crush on someone completely out of reach?" },
+      { de: "Schon mal im falschen Moment die falschen Worte gesagt — und es ruiniert?", en: "Ever said the wrong thing at the wrong moment and ruined it?" },
+      { de: "Schon mal ein Date schlecht geredet, obwohl es eigentlich okay war?", en: "Ever talked down a date to others even though it was actually fine?" },
+      { de: "Schon mal jemanden zu einem Treffen eingeladen und dann gehofft, er sagt ab?", en: "Ever invited someone to meet up and then hoped they'd cancel?" },
+      { de: "Schon mal jemanden mit Absicht ignoriert, um eine Reaktion zu provozieren?", en: "Ever deliberately ignored someone to provoke a reaction?" },
     ],
     spicy: [
       { de: "Schon mal Sex an einem Ort gehabt, wo ihr hättet erwischt werden können?", en: "Ever had sex somewhere you could have been caught?" },
@@ -1193,6 +1272,18 @@ const QUESTIONS = {
       { de: "Schon mal Sex gehabt, obwohl die Situation eigentlich unpassend war?", en: "Ever had sex even though the situation was really not appropriate?" },
       { de: "Schon mal jemanden aus deinem Freundeskreis sexuell attraktiv gefunden?", en: "Ever found someone from your friend group sexually attractive?" },
       { de: "Schon mal jemandem zugeguckt, ohne dass er es wusste?", en: "Ever watched someone without them knowing?" },
+      { de: "Schon mal eine Nacht bereut — am nächsten Morgen?", en: "Ever regretted a night — the morning after?" },
+      { de: "Schon mal jemanden nur wegen seiner körperlichen Anziehung mehrfach getroffen?", en: "Ever met someone multiple times purely for physical attraction?" },
+      { de: "Schon mal zwei Personen gleichzeitig geflirtet und beide nicht aufgeklärt?", en: "Ever flirted with two people at the same time without telling either?" },
+      { de: "Schon mal Fotos einer anderen Person auf ihrem Handy gesehen — ohne Erlaubnis?", en: "Ever seen photos on someone else's phone — without permission?" },
+      { de: "Schon mal jemanden sexuell provoziert — ganz bewusst — ohne Konsequenzen zu wollen?", en: "Ever sexually provoked someone — deliberately — without wanting consequences?" },
+      { de: "Schon mal Sex benutzt, um einen Streit zu beenden?", en: "Ever used sex to end an argument?" },
+      { de: "Schon mal eine App auf deinem Handy versteckt — aus gutem Grund?", en: "Ever hidden an app on your phone — for good reason?" },
+      { de: "Schon mal jemandem gegeben, was er wollte — nur damit er bleibt?", en: "Ever given someone what they wanted — just so they'd stay?" },
+      { de: "Schon mal mit jemandem geflirtet, der in deiner Nähe war — ohne mein Wissen?", en: "Ever flirted with someone nearby — without my knowledge?" },
+      { de: "Schon mal jemanden körperlich attraktiver gefunden als deinen aktuellen Partner?", en: "Ever found someone physically more attractive than your current partner?" },
+      { de: "Schon mal absichtlich ein anzügliches Outfit getragen, um jemand Bestimmten zu beeindrucken?", en: "Ever deliberately worn a provocative outfit to impress a specific person?" },
+      { de: "Schon mal mit jemandem gechattet, dem du nicht hättest schreiben sollen?", en: "Ever chatted with someone you shouldn't have been talking to?" },
     ],
     extreme: [
       { de: "Schon mal ein Sexvideo von dir selbst gedreht?", en: "Ever filmed a sex video of yourself?" },
@@ -1207,6 +1298,18 @@ const QUESTIONS = {
       { de: "Schon mal ein Geheimnis über dein Sexleben, das dein Partner nicht kennt?", en: "Ever kept a secret about your sex life your partner doesn't know about?" },
       { de: "Schon mal jemanden online für sexuelle Gespräche kontaktiert?", en: "Ever contacted someone online for sexual conversations?" },
       { de: "Schon mal Grenzen im Bett überschritten — oder überschreiten lassen?", en: "Ever crossed lines in bed — or let them be crossed?" },
+      { de: "Schon mal jemanden manipuliert, um sexuelle Nähe zu bekommen?", en: "Ever manipulated someone to get physical intimacy?" },
+      { de: "Schon mal jemanden betrogen und es bis heute nicht zugegeben?", en: "Ever cheated on someone and never admitted it to this day?" },
+      { de: "Schon mal Pornografie produziert — auch selbst aufgenommen?", en: "Ever produced pornography — even self-recorded?" },
+      { de: "Schon mal eine sexuelle Begegnung gehabt, über die du dich noch heute schämst?", en: "Ever had a sexual encounter you're still ashamed of today?" },
+      { de: "Schon mal mit dem Gedanken gespielt, deine sexuelle Identität neu zu definieren?", en: "Ever seriously considered redefining your sexual identity?" },
+      { de: "Schon mal absichtlich emotionalen Schmerz benutzt, um jemanden sexuell zu kontrollieren?", en: "Ever deliberately used emotional pain to sexually control someone?" },
+      { de: "Schon mal sexuelle Inhalte von jemand anderem ohne Erlaubnis gespeichert?", en: "Ever saved sexual content of someone else without their permission?" },
+      { de: "Schon mal einer Person sexuell etwas angetan, das du nie zugeben würdest?", en: "Ever done something sexual to a person you would never admit to?" },
+      { de: "Schon mal eine sexuelle Grenze überschritten — und es still für dich behalten?", en: "Ever crossed a sexual boundary — and kept it quietly to yourself?" },
+      { de: "Schon mal jemanden in eine sexuelle Situation gelockt, auf die er nicht vorbereitet war?", en: "Ever lured someone into a sexual situation they weren't prepared for?" },
+      { de: "Schon mal deine Vergangenheit in einer Beziehung komplett umgeschrieben?", en: "Ever completely rewritten your past in a relationship?" },
+      { de: "Schon mal in einer Situation gelogen, um nicht als sexuell unerfahren zu gelten?", en: "Ever lied in a situation to avoid being seen as sexually inexperienced?" },
     ]
   },
 
@@ -1223,14 +1326,26 @@ const QUESTIONS = {
       { de: "Nenn deinem Partner drei Dinge, die du von ihm gelernt hast.", en: "Name three things you've learned from your partner." },
       { de: "Massiere deinem Partner 2 Minuten lang die Schultern.", en: "Massage your partner's shoulders for 2 minutes." },
       { de: "Erzähle, was dein erstes Gefühl war, als ihr euch das erste Mal berührt habt.", en: "Tell your partner what you felt the first time you touched each other." },
-      { de: "Zeig deinem Partner deine Lieblingspose auf einem Foto — stell sie nach.", en: "Show your partner your favorite pose in a photo — recreate it together." },
+      { de: "Zeig deinem Partner deine Lieblingspose — stell sie gemeinsam nach.", en: "Show your partner your favorite pose — recreate it together." },
+      { de: "Schreib auf deinen Arm, was du an deinem Partner liebst — mit dem Finger, nicht sichtbar.", en: "Write on your arm what you love about your partner — with your finger, invisibly." },
+      { de: "Sagt euch gegenseitig drei Worte, die den anderen perfekt beschreiben.", en: "Say three words to each other that perfectly describe the other person." },
+      { de: "Macht ein Selfie zusammen — so wie ihr gerade ausseht, kein Filter, kein Posing.", en: "Take a selfie together — just as you are right now, no filter, no posing." },
+      { de: "Einer schließt die Augen — der andere führt ihn 2 Minuten blind durch den Raum.", en: "One closes their eyes — the other guides them blindly around the room for 2 minutes." },
+      { de: "Erzählt euch gleichzeitig, was euch heute am meisten beschäftigt hat.", en: "Tell each other simultaneously what's been on your mind most today." },
+      { de: "Macht euch gegenseitig ein ehrliches Kompliment über etwas, das ihr selten ansprecht.", en: "Give each other an honest compliment about something you rarely mention." },
+      { de: "Haltet euch eine Minute lang an den Händen und redet nicht.", en: "Hold hands for one minute without talking." },
+      { de: "Singe deinem Partner 10 Sekunden lang ein Lied, das dich an ihn erinnert.", en: "Sing your partner 10 seconds of a song that reminds you of them." },
+      { de: "Zeig deinem Partner deinen Lieblingsplatz in der Wohnung — und erkläre, warum.", en: "Show your partner your favorite spot in the apartment — and explain why." },
+      { de: "Sag deinem Partner etwas, das du dich im Alltag nie traust zu sagen.", en: "Tell your partner something you never dare say in everyday life." },
+      { de: "Macht euch gegenseitig eine kleine Massage an Händen oder Füßen — 90 Sekunden.", en: "Give each other a small hand or foot massage — 90 seconds each." },
+      { de: "Stellt euch vor, ihr habt euch heute erst kennengelernt — wie würdet ihr euch vorstellen?", en: "Pretend you just met today — how would you introduce yourselves?" },
     ],
     spicy: [
       { de: "Beschreibe deinem Partner in 60 Sekunden, was du heute Nacht mit ihm machen würdest — so explizit wie möglich.", en: "Describe to your partner in 60 seconds what you'd do to them tonight — as explicitly as possible." },
       { de: "Zeig deinem Partner, wie du geküsst werden willst — ohne Worte.", en: "Show your partner exactly how you want to be kissed — no words." },
       { de: "Sag deinem Partner laut, welches Körperteil du von ihm am liebsten magst — und warum.", en: "Say out loud which body part of your partner you love most — and why." },
       { de: "Berühre deinen Partner 60 Sekunden lang nur mit den Fingerspitzen — er bestimmt wo.", en: "Touch your partner for 60 seconds using only your fingertips — they decide where." },
-      { de: "Erzähle deiner Partnerin deine heißeste Fantasie über sie — in aller Ruhe und in allen Details.", en: "Tell your partner your hottest fantasy about them — calmly and in full detail." },
+      { de: "Erzähle deinem Partner deine heißeste Fantasie — in aller Ruhe und in allen Details.", en: "Tell your partner your hottest fantasy — calmly and in full detail." },
       { de: "Zieh ein Kleidungsstück aus — aber mach es langsam.", en: "Take off one item of clothing — but do it slowly." },
       { de: "Sag deinem Partner drei Dinge, die du im Bett noch nie mit ihm gemacht hast, aber willst.", en: "Tell your partner three things you've never done in bed with them but want to." },
       { de: "Küss deinen Partner 30 Sekunden lang — aber bewegt euch dabei nicht von der Stelle.", en: "Kiss your partner for 30 seconds — but neither of you can move your feet." },
@@ -1238,6 +1353,18 @@ const QUESTIONS = {
       { de: "Massiere deinen Partner 3 Minuten lang — er sagt dir, wohin deine Hände sollen.", en: "Massage your partner for 3 minutes — they guide your hands." },
       { de: "Zeig deinem Partner, wie du berührt werden willst — zeig es an dir selbst.", en: "Show your partner how you want to be touched — demonstrate on yourself." },
       { de: "Sag deinem Partner einen Satz, der allein durch den Klang schon aufreizend ist.", en: "Say a sentence to your partner that's arousing through sound alone." },
+      { de: "Beschreibe deinen Partner von Kopf bis Fuß — nur die Teile, die dich anziehen.", en: "Describe your partner from head to toe — only the parts that attract you." },
+      { de: "Spiel 2 Minuten lang den Part, den du normalerweise nicht spielst — führen oder folgen.", en: "Play for 2 minutes the role you don't usually play — lead or follow." },
+      { de: "Sagt euch gleichzeitig, was ihr euch heute Nacht voneinander wünscht.", en: "Tell each other simultaneously what you want from each other tonight." },
+      { de: "Einer gibt Anweisungen — der andere folgt ihnen blind für 90 Sekunden.", en: "One gives instructions — the other follows them blindly for 90 seconds." },
+      { de: "Küsst euch auf eine Art, wie ihr es seit Langem nicht mehr getan habt.", en: "Kiss each other in a way you haven't in a long time." },
+      { de: "Macht etwas, das ihr normalerweise nicht tut — und schaut, wie es sich anfühlt.", en: "Do something you normally don't — and see how it feels." },
+      { de: "Streichelt euch gegenseitig 90 Sekunden lang — ohne Ziel, nur um zu spüren.", en: "Caress each other for 90 seconds — no goal, just to feel." },
+      { de: "Sagt euch, was ihr am Sex mit dem anderen am meisten vermisst — und warum.", en: "Tell each other what you miss most about sex with the other — and why." },
+      { de: "Einer liest dem anderen eine Textnachricht vor, die er nie abgeschickt hat.", en: "One reads the other a text message they never sent." },
+      { de: "Tauscht für eine Minute die Rollen — wer gibt, empfängt. Wer empfängt, gibt.", en: "Swap roles for one minute — who gives, receives. Who receives, gives." },
+      { de: "Berührt euch gegenseitig an einer Stelle, die ihr normalerweise ignoriert.", en: "Touch each other somewhere you usually ignore." },
+      { de: "Sagt einander drei Dinge, die ihr gerne öfter im Bett hören würdet.", en: "Tell each other three things you'd love to hear more often in bed." },
     ],
     extreme: [
       { de: "Erkläre deinem Partner deine expliziteste Fantasie — spare keine Details.", en: "Explain your most explicit fantasy to your partner — spare no details." },
@@ -1252,11 +1379,23 @@ const QUESTIONS = {
       { de: "Tauscht eure Handys aus und zeigt euch gegenseitig das letzte Foto, das ihr geschossen habt.", en: "Swap phones and show each other the last photo you took." },
       { de: "Einer sagt, was er sich wünscht — der andere hat 5 Minuten Zeit, es umzusetzen.", en: "One says what they wish for — the other has 5 minutes to make it happen." },
       { de: "Macht ein Foto von euch beiden in diesem Moment — speichert es als Erinnerung an heute.", en: "Take a photo of yourselves right now — save it as a memory of tonight." },
+      { de: "Zeigt euch gegenseitig etwas auf dem Handy, das ihr noch niemandem gezeigt habt.", en: "Show each other something on your phone you've never shown anyone." },
+      { de: "Sagt euch laut, was ihr voneinander wollt — ohne Umschreibungen, direkt.", en: "Tell each other out loud what you want from each other — no euphemisms, direct." },
+      { de: "Einer trägt dem anderen ein Geheimnis an — das er noch nie geteilt hat.", en: "One confides a secret to the other — one they've never shared before." },
+      { de: "Macht etwas, das sich verboten anfühlt — aber harmlos ist.", en: "Do something that feels forbidden — but is harmless." },
+      { de: "Sagt euch gegenseitig, was ihr bereut — in dieser Beziehung.", en: "Tell each other what you regret — in this relationship." },
+      { de: "Lest dem anderen die letzte Sprachnachricht vor, die ihr abgeschickt habt.", en: "Read the last voice message you sent — out loud to the other." },
+      { de: "Einer gibt dem anderen eine Aufgabe für die nächste Woche — intim, konkret, verbindlich.", en: "One gives the other a task for next week — intimate, concrete, binding." },
+      { de: "Zeigt euch gegenseitig, was euch am anderen am meisten überrascht hat — je.", en: "Show each other what has surprised you most about the other — ever." },
+      { de: "Macht 5 Minuten lang ausschließlich das, was der andere möchte — ohne Fragen.", en: "Do exclusively what the other wants for 5 minutes — no questions asked." },
+      { de: "Sagt euch gegenseitig, was ihr nicht mögt — aber aus Rücksicht nie ansprecht.", en: "Tell each other what you don't like — but never bring up out of consideration." },
+      { de: "Einer macht die Augen zu — der andere küsst ihn überall, nur nicht auf den Mund.", en: "One closes their eyes — the other kisses them everywhere except the mouth." },
+      { de: "Sagt euch, was ihr voneinander braucht — und was ihr bereit seid zu geben.", en: "Tell each other what you need from each other — and what you're willing to give." },
     ]
   }
 };
 
-// ─── STATE ──────────────────────────────────────────────────────
+ ──────────────────────────────────────────────────────
 let lang = 'de';
 let currentMode = 'haveyouever';
 let currentIntensity = 'extreme';
@@ -1606,16 +1745,79 @@ function nextCard() {
 }
 
 function showDoneState() {
-  document.getElementById('card-question').textContent = currentMode === 'challenge'
+  const isChallenge = currentMode === 'challenge';
+  document.getElementById('card-question').textContent = isChallenge
     ? `${challengeScore} ${lang === 'de' ? 'Challenges geschafft!' : 'Challenges done!'}`
-    : t('done');
+    : (lang === 'de' ? 'Alle Karten gespielt!' : 'All cards played!');
   document.getElementById('card-deck-label').textContent = '✦';
   const wrap = document.getElementById('scratch-wrap');
   wrap.classList.remove('active');
 
   document.getElementById('game-actions').innerHTML = `
-    <button class="start-btn" onclick="reshuffleDeck()" style="margin:0">${t('doneBtn')}</button>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="start-btn" onclick="generateAndContinue()" id="ai-continue-btn" style="margin:0">
+        ${lang === 'de' ? '✦ Neue Fragen generieren' : '✦ Generate new questions'}
+      </button>
+      <button class="btn-challenge-skip" onclick="startGame()">
+        ${lang === 'de' ? 'Nochmal von vorne' : 'Start over'}
+      </button>
+    </div>
   `;
+
+  // Auto-trigger AI generation
+  generateAndContinue();
+}
+
+async function generateAndContinue() {
+  const btn = document.getElementById('ai-continue-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = lang === 'de' ? '...' : '...';
+  }
+  document.getElementById('card-question').textContent = lang === 'de' ? 'KI generiert neue Karten...' : 'AI is generating new cards...';
+  document.getElementById('card-deck-label').textContent = '🤖';
+
+  const modeDescriptions = {
+    haveyouever: lang === 'de' ? 'Formuliere als "Hast du schon mal..."-Fragen mit klarem Ja/Nein' : 'Format as "Have you ever..."-questions with clear Yes/No answer',
+    talk: lang === 'de' ? 'Offene Gesprächsfragen für Paare, kein Ja/Nein nötig' : 'Open conversation questions for couples, no yes/no needed',
+    drink: lang === 'de' ? 'Kurze direkte "Schon mal..."-Fragen für ein Trinkspiel' : 'Short direct "Ever..."-questions for a drinking game',
+    challenge: lang === 'de' ? 'Konkrete Aufgaben/Challenges die Paare gemeinsam ausführen' : 'Concrete challenges/tasks that couples do together',
+  };
+  const intensityDescriptions = {
+    flirty: lang === 'de' ? 'romantisch, zärtlich, emotional — kein expliziter Sex-Content' : 'romantic, tender, emotional — no explicit sexual content',
+    spicy: lang === 'de' ? 'sexuell aufgeladen, direkt, 18+ aber nicht extrem explizit' : 'sexually charged, direct, 18+ but not extremely explicit',
+    extreme: lang === 'de' ? 'sehr explizit, tabulos, 18+ ohne Filter' : 'very explicit, no taboos, 18+ unfiltered',
+  };
+
+  const systemPrompt = lang === 'de'
+    ? `Du generierst Karten für das Paare-Kartenspiel "Velato" (18+). Modus: ${modeDescriptions[currentMode]}. Intensität: ${intensityDescriptions[currentIntensity]}. Generiere genau 15 neue, frische Karten. Gib NUR ein JSON-Array zurück, kein Markdown, keine Erklärungen. Format: [{"de":"Text auf Deutsch","en":"Text in English"}]`
+    : `You generate cards for the couples card game "Velato" (18+). Mode: ${modeDescriptions[currentMode]}. Intensity: ${intensityDescriptions[currentIntensity]}. Generate exactly 15 new, fresh cards. Return ONLY a JSON array, no markdown, no explanations. Format: [{"de":"Text auf Deutsch","en":"Text in English"}]`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: lang === 'de' ? `Erstelle 15 neue Karten für Modus "${currentMode}", Intensität "${currentIntensity}". Keine der folgenden Fragen wiederholen — sei kreativ und überraschend.` : `Create 15 new cards for mode "${currentMode}", intensity "${currentIntensity}". Don't repeat existing questions — be creative and surprising.` }]
+      })
+    });
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || '[]';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const newCards = JSON.parse(clean);
+
+    // Inject into deck and continue playing
+    currentDeck = shuffleArray(newCards.map(q => ({ ...q, intensity: currentIntensity, aiGenerated: true })));
+    currentIndex = 0;
+    showCard(false);
+    renderGameActions();
+  } catch (e) {
+    document.getElementById('card-question').textContent = lang === 'de' ? 'Fehler — bitte erneut versuchen.' : 'Error — please try again.';
+    if (btn) { btn.disabled = false; btn.textContent = lang === 'de' ? '✦ Nochmal versuchen' : '✦ Try again'; }
+  }
 }
 
 function reshuffleDeck() { startGame(); }
