@@ -683,73 +683,6 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ─── SCRATCH TOGGLE ─── */
-  .scratch-toggle-row {
-    width: 100%;
-    padding: 0 20px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .scratch-toggle-label {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 13px; color: var(--text-dim);
-  }
-  .scratch-toggle-label span { font-size: 18px; }
-  .toggle-switch {
-    width: 44px; height: 26px;
-    background: var(--card-border);
-    border-radius: 13px;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.2s;
-    flex-shrink: 0;
-  }
-  .toggle-switch.on { background: var(--accent); }
-  .toggle-switch::after {
-    content: '';
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: white;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-  }
-  .toggle-switch.on::after { transform: translateX(18px); }
-
-  /* ─── SCRATCH CANVAS OVERLAY ─── */
-  .scratch-canvas-wrap {
-    position: absolute; inset: 0;
-    border-radius: 24px;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 10;
-    display: none;
-  }
-  .scratch-canvas-wrap.active {
-    display: block;
-    pointer-events: all;
-  }
-  #scratch-canvas {
-    width: 100%; height: 100%;
-    display: block;
-    cursor: crosshair;
-    border-radius: 24px;
-  }
-  .scratch-hint {
-    position: absolute;
-    bottom: 50%; left: 50%;
-    transform: translate(-50%, 50%);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(245,238,240,0.7);
-    pointer-events: none;
-    text-align: center;
-    line-height: 1.5;
-  }
-  .scratch-hint-icon { font-size: 28px; display: block; margin-bottom: 6px; }
-
   /* ─── CHALLENGE MODE ─── */
   .challenge-action-wrap {
     display: flex; flex-direction: column; gap: 10px;
@@ -925,17 +858,6 @@
     </div>
   </div>
 
-  <div class="scratch-toggle-row">
-    <div class="scratch-toggle-label">
-      <span>🪙</span>
-      <div>
-        <div id="scratch-toggle-title" style="font-size:13px;font-weight:600;color:var(--text)">Scratch-Modus</div>
-        <div id="scratch-toggle-sub" style="font-size:11px;color:var(--text-muted);margin-top:2px">Karte erst freirubbeln</div>
-      </div>
-    </div>
-    <div class="toggle-switch" id="scratch-toggle" onclick="toggleScratch()"></div>
-  </div>
-
   <button class="start-btn" id="start-btn" onclick="startGame()">Spiel starten</button>
 
   <button class="ai-nav-btn" onclick="showScreen('screen-ai')">
@@ -970,14 +892,6 @@
         <div class="card-question" id="card-question">Lade...</div>
         <div class="card-ornament">✦</div>
         <div class="challenge-score" id="challenge-score">0 ✓</div>
-        <!-- Scratch overlay -->
-        <div class="scratch-canvas-wrap" id="scratch-wrap">
-          <canvas id="scratch-canvas"></canvas>
-          <div class="scratch-hint">
-            <span class="scratch-hint-icon">🪙</span>
-            <span id="scratch-hint-text">Hier kratzen<br>um zu enthüllen</span>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -993,6 +907,7 @@
     <button class="game-back" onclick="showScreen('screen-home')">←</button>
     <div class="favs-title" id="favs-title">Favoriten</div>
   </div>
+  <button class="start-btn" id="favs-play-btn" onclick="playFavorites()" style="margin:8px 20px 4px;width:calc(100% - 40px);display:none">▶ Favoriten spielen</button>
   <div class="favs-list" id="favs-list"></div>
 </div>
 
@@ -1344,17 +1259,31 @@ const QUESTIONS = {
   }
 };
 
- ──────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────
 let lang = 'de';
 let currentMode = 'haveyouever';
 let currentIntensity = 'extreme';
-let scratchMode = false;
 let challengeScore = 0;
 let currentDeck = [];
 let currentIndex = 0;
 let favorites = JSON.parse(localStorage.getItem('velato_favs') || '[]');
 let aiGeneratedQuestions = [];
 let seenIds = new Set(JSON.parse(localStorage.getItem('velato_seen') || '[]'));
+let trackSeen = true;
+let freeDeck = false;   // true = Favoriten-/KI-Deck (einfacher "Nächste Karte"-Modus)
+
+// ─── SEEN-TRACKING (Wiederholungen vermeiden) ───────────────────
+function cardKey(q) {
+  return (q.intensity || currentIntensity) + '|' + (q.de || q.en);
+}
+function persistSeen() {
+  try { localStorage.setItem('velato_seen', JSON.stringify([...seenIds])); } catch (e) {}
+}
+function markSeen(q) {
+  if (!q) return;
+  seenIds.add(cardKey(q));
+  persistSeen();
+}
 
 const T = {
   de: {
@@ -1391,13 +1320,6 @@ const T = {
     toastChallengeDone: '✓ Challenge geschafft!',
     done: 'Alle Karten gespielt!',
     doneBtn: 'Neu mischen',
-    agTitle: 'Nur für Erwachsene',
-    agText: 'Velato enthält explizite Inhalte für Erwachsene. Bitte bestätige, dass du mindestens 18 Jahre alt bist.',
-    agYes: 'Ich bin 18+ — Weiter',
-    agNo: 'Ich bin unter 18',
-    scratchTitle: 'Scratch-Modus',
-    scratchSub: 'Karte erst freirubbeln',
-    scratchHint: 'Hier kratzen\num zu enthüllen',
   },
   en: {
     eyebrow: 'Questions for Couples',
@@ -1433,44 +1355,14 @@ const T = {
     toastChallengeDone: '✓ Challenge complete!',
     done: 'All cards played!',
     doneBtn: 'Shuffle again',
-    agTitle: 'Adults Only',
-    agText: 'Velato contains explicit content for adults. Please confirm you are at least 18 years old.',
-    agYes: 'I\'m 18+ — Continue',
-    agNo: 'I\'m under 18',
-    scratchTitle: 'Scratch Mode',
-    scratchSub: 'Scratch to reveal the card',
-    scratchHint: 'Scratch here\nto reveal',
   }
 };
 
 // ─── INIT ────────────────────────────────────────────────────────
 function init() {
-  // Age gate buttons — explicit listeners for mobile reliability
-  const agYes = document.getElementById('ag-yes');
-  const agNo = document.getElementById('ag-no');
-  if (agYes) agYes.addEventListener('click', confirmAge);
-  if (agNo) agNo.addEventListener('click', denyAge);
-
-  if (localStorage.getItem('velato_age_ok') === '1') {
-    hideAgeGate();
-  }
   updateUI();
   selectIntensity(currentIntensity);
   selectMode(currentMode);
-}
-
-function hideAgeGate() {
-  document.getElementById('screen-agegate').classList.remove('active');
-  document.getElementById('screen-home').classList.add('active');
-}
-
-function confirmAge() {
-  localStorage.setItem('velato_age_ok', '1');
-  hideAgeGate();
-}
-
-function denyAge() {
-  document.body.innerHTML = '<div style="background:#0D0D0D;color:#8A7578;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;font-size:14px;text-align:center;padding:40px;">Diese App ist nur für Personen ab 18 Jahren.<br><br>This app is for adults 18+ only.</div>';
 }
 
 // ─── LANGUAGE ───────────────────────────────────────────────────
@@ -1505,15 +1397,6 @@ function updateUI() {
   document.getElementById('ai-input-label').textContent = t('aiInputLabel');
   document.getElementById('ai-topic-input').placeholder = t('aiInputPlaceholder');
   document.getElementById('ai-gen-btn-text').textContent = t('aiGenBtn');
-  document.getElementById('ag-title').textContent = t('agTitle');
-  document.getElementById('ag-text').textContent = t('agText');
-  document.getElementById('ag-yes').textContent = t('agYes');
-  document.getElementById('ag-no').textContent = t('agNo');
-  document.getElementById('scratch-toggle-title').textContent = t('scratchTitle');
-  document.getElementById('scratch-toggle-sub').textContent = t('scratchSub');
-  if (document.getElementById('scratch-hint-text')) {
-    document.getElementById('scratch-hint-text').innerHTML = t('scratchHint').replace('\n', '<br>');
-  }
   renderFavs();
   if (currentDeck.length > 0) renderGameActions();
 }
@@ -1546,98 +1429,26 @@ function selectMode(mode) {
   });
 }
 
-// ─── SCRATCH TOGGLE ─────────────────────────────────────────────
-function toggleScratch() {
-  scratchMode = !scratchMode;
-  document.getElementById('scratch-toggle').classList.toggle('on', scratchMode);
-}
-
-// ─── SCRATCH MECHANIC ───────────────────────────────────────────
-let scratchRevealed = false;
-let scratchCtx = null;
-let scratchIsDrawing = false;
-
-function initScratchCard() {
-  const wrap = document.getElementById('scratch-wrap');
-  const canvas = document.getElementById('scratch-canvas');
-  if (!scratchMode) { wrap.classList.remove('active'); return; }
-
-  scratchRevealed = false;
-  wrap.classList.add('active');
-
-  // Size canvas to card
-  const card = document.getElementById('main-card');
-  const rect = card.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-
-  scratchCtx = canvas.getContext('2d');
-  // Fill with dark scratch layer
-  const grad = scratchCtx.createLinearGradient(0, 0, rect.width, rect.height);
-  grad.addColorStop(0, '#1C0A0E');
-  grad.addColorStop(1, '#2D1015');
-  scratchCtx.fillStyle = grad;
-  scratchCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Draw hint text on canvas
-  scratchCtx.font = 'bold 11px Inter, sans-serif';
-  scratchCtx.fillStyle = 'rgba(245,238,240,0.5)';
-  scratchCtx.textAlign = 'center';
-  scratchCtx.fillText(lang === 'de' ? '🪙 Hier kratzen zum Enthüllen' : '🪙 Scratch to reveal', canvas.width / 2, canvas.height / 2);
-
-  scratchCtx.globalCompositeOperation = 'destination-out';
-}
-
-function getScratchPos(e, canvas) {
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  if (e.touches) {
-    return {
-      x: (e.touches[0].clientX - rect.left) * scaleX,
-      y: (e.touches[0].clientY - rect.top) * scaleY
-    };
-  }
-  return {
-    x: (e.clientX - rect.left) * scaleX,
-    y: (e.clientY - rect.top) * scaleY
-  };
-}
-
-function scratchAt(x, y) {
-  if (!scratchCtx) return;
-  scratchCtx.beginPath();
-  scratchCtx.arc(x, y, 32, 0, Math.PI * 2);
-  scratchCtx.fill();
-  checkScratchProgress();
-}
-
-function checkScratchProgress() {
-  if (scratchRevealed) return;
-  const canvas = document.getElementById('scratch-canvas');
-  const imageData = scratchCtx.getImageData(0, 0, canvas.width, canvas.height);
-  const pixels = imageData.data;
-  let transparent = 0;
-  for (let i = 3; i < pixels.length; i += 4) {
-    if (pixels[i] < 128) transparent++;
-  }
-  const ratio = transparent / (pixels.length / 4);
-  if (ratio > 0.55) {
-    scratchRevealed = true;
-    const wrap = document.getElementById('scratch-wrap');
-    wrap.style.transition = 'opacity 0.4s';
-    wrap.style.opacity = '0';
-    setTimeout(() => { wrap.classList.remove('active'); wrap.style.opacity = ''; wrap.style.transition = ''; }, 400);
-  }
-}
-
 // ─── GAME ───────────────────────────────────────────────────────
 function startGame() {
+  trackSeen = true;
+  freeDeck = false;
   const modePool = (QUESTIONS[currentMode] && QUESTIONS[currentMode][currentIntensity]) || [];
   const aiPool = aiGeneratedQuestions.filter(q => q.intensity === currentIntensity);
   const pool = [...modePool, ...aiPool];
-  const unseenPool = pool.filter((_, i) => !seenIds.has(currentMode + '_' + currentIntensity + '_' + i));
-  currentDeck = shuffleArray(unseenPool.length > 0 ? unseenPool : pool);
+
+  // Bereits gesehene Karten herausfiltern
+  const unseenPool = pool.filter(q => !seenIds.has(cardKey(q)));
+  let playPool;
+  if (unseenPool.length > 0) {
+    playPool = unseenPool;
+  } else {
+    // Alle Karten dieses Modus/Intensität gespielt → Verlauf zurücksetzen
+    pool.forEach(q => seenIds.delete(cardKey(q)));
+    persistSeen();
+    playPool = pool;
+  }
+  currentDeck = shuffleArray(playPool);
   currentIndex = 0;
   challengeScore = 0;
 
@@ -1666,15 +1477,14 @@ function showCard(animate = true) {
   document.getElementById('progress-fill').style.width = `${((currentIndex + 1) / Math.min(total, 20)) * 100}%`;
 
   const labelMap = { flirty: 'FLIRTY 💋', spicy: 'SPICY 🌶️', extreme: 'EXTREM 🔥' };
-  document.getElementById('card-deck-label').textContent = labelMap[currentIntensity] || '';
+  document.getElementById('card-deck-label').textContent = labelMap[q.intensity || currentIntensity] || '';
 
   const applyCard = () => {
     document.getElementById('card-question').textContent = q[lang] || q['de'];
     card.classList.add('glowing');
     setTimeout(() => card.classList.remove('glowing'), 300);
     updateFavBtn();
-    // Init scratch if mode on
-    setTimeout(() => initScratchCard(), 50);
+    if (trackSeen) markSeen(q);
   };
 
   if (animate) {
@@ -1705,8 +1515,6 @@ function showDoneState() {
     ? `${challengeScore} ${lang === 'de' ? 'Challenges geschafft!' : 'Challenges done!'}`
     : (lang === 'de' ? 'Alle Karten gespielt!' : 'All cards played!');
   document.getElementById('card-deck-label').textContent = '✦';
-  const wrap = document.getElementById('scratch-wrap');
-  wrap.classList.remove('active');
 
   document.getElementById('game-actions').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -1765,6 +1573,7 @@ async function generateAndContinue() {
     const newCards = JSON.parse(clean);
 
     // Inject into deck and continue playing
+    trackSeen = false;
     currentDeck = shuffleArray(newCards.map(q => ({ ...q, intensity: currentIntensity, aiGenerated: true })));
     currentIndex = 0;
     showCard(false);
@@ -1779,6 +1588,14 @@ function reshuffleDeck() { startGame(); }
 
 function renderGameActions() {
   const actions = document.getElementById('game-actions');
+  if (freeDeck) {
+    actions.innerHTML = `
+      <div class="actions-talk">
+        <button class="btn-next-talk" onclick="nextCard()">${t('btnNextTalk')}</button>
+      </div>
+    `;
+    return;
+  }
   if (currentMode === 'haveyouever') {
     actions.innerHTML = `
       <div class="actions-haveyouever">
@@ -1880,9 +1697,15 @@ function updateFavBtn() {
 
 function renderFavs() {
   const container = document.getElementById('favs-list');
+  const playBtn = document.getElementById('favs-play-btn');
   if (!favorites.length) {
+    if (playBtn) playBtn.style.display = 'none';
     container.innerHTML = `<div class="favs-empty"><div class="favs-empty-icon">♡</div>${t('favsEmpty')}</div>`;
     return;
+  }
+  if (playBtn) {
+    playBtn.style.display = 'block';
+    playBtn.textContent = lang === 'de' ? `▶ Favoriten spielen (${favorites.length})` : `▶ Play favorites (${favorites.length})`;
   }
   const labelMap = { flirty: 'FLIRTY 💋', spicy: 'SPICY 🌶️', extreme: 'EXTREM 🔥' };
   container.innerHTML = favorites.map((f, i) => `
@@ -1892,6 +1715,20 @@ function renderFavs() {
       <button class="fav-remove" onclick="removeFav(${i})">✕</button>
     </div>
   `).join('');
+}
+
+// Gespeicherte Favoriten als Deck spielen
+function playFavorites() {
+  if (!favorites.length) return;
+  trackSeen = false;        // Favoriten dürfen wiederholt gespielt werden
+  freeDeck = true;          // einfacher "Nächste Karte"-Modus
+  currentDeck = shuffleArray(favorites);
+  currentIndex = 0;
+  challengeScore = 0;
+  document.getElementById('challenge-score').classList.remove('visible');
+  showScreen('screen-game');
+  showCard(false);
+  renderGameActions();
 }
 
 function removeFav(i) {
@@ -1935,12 +1772,12 @@ async function generateAIDeck() {
     aiGeneratedQuestions = questions.map(q => ({ ...q, intensity: currentIntensity }));
 
     resultsDiv.innerHTML = `
+      <button class="start-btn" onclick="playAIDeck()" style="margin:16px 0 4px;width:100%">
+        ${lang === 'de' ? '▶ Dieses Deck spielen' : '▶ Play this deck'}
+      </button>
       <div class="ai-results">
-        ${questions.map((q, i) => `
-          <div class="ai-result-item" onclick="addAIToGame(${i})">
-            ${q[lang] || q.de}
-            <span class="add-to-deck">＋</span>
-          </div>
+        ${questions.map((q) => `
+          <div class="ai-result-item">${q[lang] || q.de}</div>
         `).join('')}
       </div>
     `;
@@ -1952,8 +1789,18 @@ async function generateAIDeck() {
   document.getElementById('ai-gen-btn-text').textContent = t('aiGenBtn');
 }
 
-function addAIToGame(i) {
-  showToast(t('toastAIDeck'));
+// Generiertes KI-Deck direkt spielen
+function playAIDeck() {
+  if (!aiGeneratedQuestions.length) return;
+  trackSeen = false;            // KI-Karten nicht in den "gesehen"-Verlauf aufnehmen
+  freeDeck = true;              // einfacher "Nächste Karte"-Modus
+  currentDeck = shuffleArray(aiGeneratedQuestions);
+  currentIndex = 0;
+  challengeScore = 0;
+  document.getElementById('challenge-score').classList.remove('visible');
+  showScreen('screen-game');
+  showCard(false);
+  renderGameActions();
 }
 
 // ─── UTILS ──────────────────────────────────────────────────────
@@ -1978,34 +1825,10 @@ let touchStartX = 0, touchStartY = 0, isDragging = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   const card = document.getElementById('main-card');
-  const canvas = document.getElementById('scratch-canvas');
   if (!card) return;
-
-  // ── Scratch events ──────────────────────────────────────────
-  const onScratchStart = (e) => {
-    if (!scratchMode || scratchRevealed) return;
-    scratchIsDrawing = true;
-    const pos = getScratchPos(e, canvas);
-    scratchAt(pos.x, pos.y);
-  };
-  const onScratchMove = (e) => {
-    if (!scratchIsDrawing || !scratchMode || scratchRevealed) return;
-    e.preventDefault();
-    const pos = getScratchPos(e, canvas);
-    scratchAt(pos.x, pos.y);
-  };
-  const onScratchEnd = () => { scratchIsDrawing = false; };
-
-  canvas.addEventListener('touchstart', onScratchStart, { passive: true });
-  canvas.addEventListener('touchmove', onScratchMove, { passive: false });
-  canvas.addEventListener('touchend', onScratchEnd);
-  canvas.addEventListener('mousedown', onScratchStart);
-  canvas.addEventListener('mousemove', onScratchMove);
-  canvas.addEventListener('mouseup', onScratchEnd);
 
   // ── Card swipe events ────────────────────────────────────────
   card.addEventListener('touchstart', e => {
-    if (scratchMode && !scratchRevealed) return;
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     isDragging = true;
